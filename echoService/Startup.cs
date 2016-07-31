@@ -1,5 +1,6 @@
 ﻿using System.Web.Http;
 using Owin;
+using echoService.Controllers;
 
 namespace echoService
 {
@@ -14,9 +15,10 @@ namespace echoService
 
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",
-                routeTemplate: "{controller}/{channel}/{message}",
+                routeTemplate: "{controller}/{channel}/{category}/{message}",
                 defaults: new {
                     channel = RouteParameter.Optional,
+                    category = RouteParameter.Optional,
                     message = RouteParameter.Optional
                 }
             );
