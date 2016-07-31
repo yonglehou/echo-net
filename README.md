@@ -4,14 +4,15 @@ Meant to be used as a 'printf-like diagnostic tool' to aid in tracing distribute
 Echo consists of two logical pieces: The first is a console-like aspect for viewing trace messages that are emitted via http calls to the echo service. The second is a power-bi event viewing piece. I use PowerBI to act as a configurable "View" of the trace events that are emitted, again, by calling in to an http service. 
 
 ## Example
-### echo to the 'console'
+### echo to the 'console' to get developer-centric information.
 We 'echo' messages in to a channel named 'dotnet', under the category 'noise.'
 
 ```
 curl --data-urlencode "message=Hello world" --get http://localhost:8671/console/echo/dotnet/noise/
 ```
 
-### echo to the 'canvas'
+### echo business intelligence to the 'canvas' to get an idea of the larger picture.
+
 Emit a row in to a PowerBI `container: dotnet` and a PowerBI `table: noise`.
 The event is of:
 - `order: 0` 
