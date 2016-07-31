@@ -9,6 +9,8 @@ using Microsoft.ServiceFabric.Data;
 using Microsoft.WindowsAzure.Storage.Table;
 
 using echoService.Model;
+using System.Net;
+using System.Diagnostics;
 
 namespace echoService.Controllers
 {
@@ -57,7 +59,6 @@ namespace echoService.Controllers
                 return NoCategoryError(channel, category);
             }
 
-            // the apology
             return NoChannelError(channel);
         }
 
@@ -70,13 +71,32 @@ namespace echoService.Controllers
         /// <returns></returns>
         private async Task StoreMessage(EchoMessage message)
         {
-            var table = ControllerContext.Configuration.Properties["Table"] as CloudTable;
+            try
+            {
+                var internalBatchOperation = new TableBatchOperation();
+                var table = ControllerContext.Configuration.Properties["Table"] as CloudTable;
 
-            GuaranteeChannelCategoryExists(message.Channel, message.Tags);
+                GuaranteeChannelCategoryExists(internalBatchOperation, message.Channel, message.Category);
 
-            _buffer[message.Channel][message.Tags].Add(message);   
+                _buffer[message.Channel][message.Category].Add(message);
 
-            await table.ExecuteAsync(TableOperation.InsertOrMerge(new EchoTableEntity(message)));
+                await table.ExecuteBatchAsync(internalBatchOperation); // internal data is on a separate partition.
+
+                await table.ExecuteAsync(TableOperation.InsertOrMerge(new EchoTableEntity(message)));
+
+                foreach (var result in await table.ExecuteBatchAsync(internalBatchOperation))
+                {
+                    ServiceEventSource.Current.Message($"Status code: {result.HttpStatusCode} - {Enum.GetName(typeof(HttpStatusCode), result.HttpStatusCode)}");
+                }
+            }
+            catch(ArgumentException ex) // previously hit on: All entities in a given batch must have the same partition key.
+            {
+                ServiceEventSource.Current.Message($"Argument Exception : {ex?.ParamName} - {ex.Message}\r\n{ex.StackTrace}");
+            }
+            catch(Exception ex)
+            {
+                ServiceEventSource.Current.Message($"Argument Exception : {ex.HResult} - {ex.Message}\r\n{ex.StackTrace}");
+            }
         }
 
         // echo/dotnet/noise/"hello world!"
@@ -92,47 +112,33 @@ namespace echoService.Controllers
 
         #region privates
 
-        private TableBatchOperation _batchOperation = new TableBatchOperation();
 
-        private void GuaranteeChannelCategoryExists(string channel, string category)
+        private void GuaranteeChannelCategoryExists(TableBatchOperation batchOperation, string channel, string category)
         {
             if (!_buffer.ContainsKey(channel))
             {
                 _buffer.Add(channel, new Dictionary<string, List<EchoMessage>>());
 
-                _batchOperation.Add(TableOperation.Insert(new ChannelMarkerTableEntity(channel)));
+                batchOperation.Add(TableOperation.InsertOrReplace(new ChannelMarkerTableEntity(channel)));
             }
 
             if (!_buffer[channel].ContainsKey(category))
             {
-                _batchOperation.Add(TableOperation.Insert(new CategoryMarkerTableEntity(channel, category)));
                 _buffer[channel].Add(category, new List<EchoMessage>());
+
+                batchOperation.Add(TableOperation.InsertOrReplace(new CategoryMarkerTableEntity(channel, category)));
             }
         }
 
-        private bool GuaranteeCategoryExists(string channel, string category)
-        {
-            if (_buffer.ContainsKey(channel))
-            {
-                _buffer.Add(channel, new Dictionary<string, List<EchoMessage>>());
-
-                if (!_buffer.ContainsKey(category))
-                {
-                    _buffer.Add(channel, new Dictionary<string, List<EchoMessage>>());
-                }
-            }
-            return false;
-        }
-
-        internal static EchoMessage FormatMessage(string channel, string tags, string message)
+        internal static EchoMessage FormatMessage(string channel, string category, string message)
         {
             var timestamp = DateTime.Now;
             return new EchoMessage()
             {
                 TimeStamp = timestamp,
                 Channel = channel,
-                Tags = tags,
-                FormattedMessage = $"{timestamp} - [{channel}, {tags}] :: {message}"
+                Category = category,
+                FormattedMessage = $"{timestamp} - [{channel}, {category}] :: {message}"
             };
         }
 

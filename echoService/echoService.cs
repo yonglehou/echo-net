@@ -48,7 +48,7 @@ namespace echoService
         {
             while (true)
             {
-                await Scrub(); // every 15 seconds go ahead and scrub the old messages
+                await Scrub(); // every 15 seconds delete messages past their expiratory date.
                 await Task.Delay(15000);
             }
         }

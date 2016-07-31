@@ -10,7 +10,7 @@ namespace echoService.Model
     {
         public string Channel { get; internal set; }
         public DateTimeOffset TimeStamp { get; internal set; } = DateTimeOffset.MinValue;
-        public string Tags { get; internal set; }
+        public string Category { get; internal set; }
         public string FormattedMessage { get; internal set; }
     }
 
