@@ -9,7 +9,7 @@ using Microsoft.ServiceFabric.Services.Runtime;
 
 namespace echoService
 {
-    [EventSource(Name = "MyCompany-echo-echoService")]
+    [EventSource(Name = "Microsoft-echo-echoService")]
     internal sealed class ServiceEventSource : EventSource
     {
         public static readonly ServiceEventSource Current = new ServiceEventSource();

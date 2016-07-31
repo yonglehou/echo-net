@@ -23,7 +23,7 @@ namespace echoService
 
                 ServiceRuntime.RegisterServiceAsync("echoServiceType",
                     context => new echoService(context)).GetAwaiter().GetResult();
-
+                
                 ServiceEventSource.Current.ServiceTypeRegistered(Process.GetCurrentProcess().Id, typeof(echoService).Name);
 
                 // Prevents this host process from terminating so services keeps running. 

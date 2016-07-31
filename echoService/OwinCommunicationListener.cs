@@ -77,6 +77,7 @@ namespace echoService
                     statefulServiceContext.PartitionId,
                     statefulServiceContext.ReplicaId,
                     Guid.NewGuid());
+
             }
             else if (this.serviceContext is StatelessServiceContext)
             {
@@ -100,7 +101,7 @@ namespace echoService
                 this.eventSource.ServiceMessage(this.serviceContext, "Starting web server on " + this.listeningAddress);
 
                 this.webApp = WebApp.Start(this.listeningAddress, appBuilder => this.startup.Invoke(appBuilder));
-
+                
                 this.eventSource.ServiceMessage(this.serviceContext, "Listening on " + this.publishAddress);
 
                 return Task.FromResult(this.publishAddress);
