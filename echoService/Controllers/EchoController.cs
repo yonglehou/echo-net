@@ -11,23 +11,36 @@ using Microsoft.WindowsAzure.Storage.Table;
 using echoService.Model;
 using System.Net;
 using System.Diagnostics;
+using Newtonsoft.Json;
 
 namespace echoService.Controllers
 {
     public class EchoController : ApiController
     {
         // this is how the view will be structured
-        // channel, category, then list of messages - time ordered?
-        private Dictionary<string, Dictionary<string, List<EchoMessage>>> _buffer = new Dictionary<string, Dictionary<string, List<EchoMessage>>>();
+        // channels are composed of categories which are composed of messages that are in time order.
+        private Dictionary<string, Dictionary<string, List<EchoMessage>>> _buffer;
+
+        /// <summary>
+        /// Use this Buffer for read operations, and use _buffer for the write operations.
+        /// </summary>
+        IReadOnlyDictionary<string, Dictionary<string, List<EchoMessage>>> Buffer
+        {
+            get
+            {
+                if (_buffer == null) FetchAll().Wait();
+                return _buffer;
+            }
+        }
 
         public JsonResult<IEnumerable<EchoMessage>> GetAsync(string channel)
         {         
             // given only a channel (and no category) I will return a concatenated list of echo messages.
-            if(_buffer.ContainsKey(channel))
+            if(Buffer.ContainsKey(channel))
             {
                 IEnumerable<EchoMessage> allMessages = new List<EchoMessage>();
                        
-                foreach (var category in _buffer[channel])
+                foreach (var category in Buffer[channel])
                 {
                     allMessages = allMessages.Concat(category.Value);
                 }
@@ -39,21 +52,21 @@ namespace echoService.Controllers
             return NoChannelError(channel);
         }
 
-        public JsonResult<Dictionary<string, Dictionary<string, List<EchoMessage>>>> Get()
+        public JsonResult<IReadOnlyDictionary<string, Dictionary<string, List<EchoMessage>>>> Get()
         {
-            // all data for now, I'll use this to debug.
-            return Json(_buffer);
+            return Json(Buffer);
         }
 
         // GET echo 
         public JsonResult<IEnumerable<EchoMessage>> Get(string channel, string category)
         {
+            
             // if we're lucky, we've got the channel on hand, otherwise, craft an apology.
-            if (_buffer.ContainsKey(channel))
+            if (Buffer.ContainsKey(channel))
             {
-                if (_buffer[channel].ContainsKey(category))
+                if (Buffer[channel].ContainsKey(category))
                 {
-                    return Json<IEnumerable<EchoMessage>>(_buffer[channel][category]);
+                    return Json<IEnumerable<EchoMessage>>(Buffer[channel][category]);
                 }
 
                 return NoCategoryError(channel, category);
@@ -115,14 +128,14 @@ namespace echoService.Controllers
 
         private void GuaranteeChannelCategoryExists(TableBatchOperation batchOperation, string channel, string category)
         {
-            if (!_buffer.ContainsKey(channel))
+            if (!Buffer.ContainsKey(channel))
             {
                 _buffer.Add(channel, new Dictionary<string, List<EchoMessage>>());
 
                 batchOperation.Add(TableOperation.InsertOrReplace(new ChannelMarkerTableEntity(channel)));
             }
 
-            if (!_buffer[channel].ContainsKey(category))
+            if (!Buffer[channel].ContainsKey(category))
             {
                 _buffer[channel].Add(category, new List<EchoMessage>());
 
@@ -149,7 +162,53 @@ namespace echoService.Controllers
 
         private JsonResult<IEnumerable<EchoMessage>> NoCategoryError(string channel, string category)
         {
-            return Json<IEnumerable<EchoMessage>>(new[] { FormatMessage(channel, "error", $"Sorry, there is no category with the name: '{channel}'") });
+            return Json<IEnumerable<EchoMessage>>(new[] { FormatMessage(channel, "error", $"Sorry, there is no category with the name: '{category}'") });
+        }
+
+        private async Task FetchAll()
+        {
+            var watch = Stopwatch.StartNew();
+            _buffer = new Dictionary<string, Dictionary<string, List<EchoMessage>>>();
+            // all data for now, I'll use this to debug.
+            var table = ControllerContext.Configuration.Properties["Table"] as CloudTable;
+
+            // first we retrieve the channel markers
+            var result = (from x in table.CreateQuery<EchoTableEntity>()
+                          where x.PartitionKey == "__echo_internal__"
+                          select x).ToList();
+
+            // then, we retrieve the data for each channel and serialize it in to our cache.
+            foreach (var channel_marker in result)
+            {
+                try
+                {
+                    var marker = JsonConvert.DeserializeObject<Marker>(channel_marker.RowKey);
+
+                    if (!_buffer.ContainsKey(marker.Channel))
+                    {
+                        _buffer.Add(marker.Channel, new Dictionary<string, List<EchoMessage>>());
+                    }
+
+                    var channelTableEntities = (from element in table.CreateQuery<EchoTableEntity>()
+                                                where element.PartitionKey == marker.Channel
+                                                select element).ToList();
+
+                    // convert them to categorized messages and place them in the dictionary.
+                    var categorizedMessages = channelTableEntities.Select(x => x.ToEchoMessage()).GroupBy(x => x.Category);
+
+                    foreach (var category in categorizedMessages)
+                    {
+                        if (!_buffer[marker.Channel].ContainsKey(category.Key))
+                        {
+                            _buffer[marker.Channel].Add(category.Key, category.ToList());
+                        }
+                    }
+
+                }
+                catch (Exception ex) { ServiceEventSource.Current.Message($"{ex}"); }
+            }
+
+            ServiceEventSource.Current.Message($"all data retrieved and serialized in {watch.ElapsedMilliseconds} ms - goal is 500 ms");
         }
 
         #endregion

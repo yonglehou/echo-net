@@ -9,14 +9,22 @@ using System.Threading.Tasks;
 
 namespace echoService.Model
 {
+    public struct Marker
+    {
+        public string Type { get; set; }
+        public string Channel { get; set; }
+        public string Name { get; set; }
+    }
+
     public class ChannelMarkerTableEntity : EchoTableEntity
     {
         public ChannelMarkerTableEntity(string channel) : base(EchoController.FormatMessage(channel, "dev_static_channel_marker", channel))
         {
             PartitionKey = "__echo_internal__";
-            RowKey = JsonConvert.SerializeObject(new
+            RowKey = JsonConvert.SerializeObject(new Marker
             {
                 Type = "channel_marker",
+                Channel = channel,
                 Name = channel
             });
         }
@@ -27,7 +35,7 @@ namespace echoService.Model
         public CategoryMarkerTableEntity(string channel, string category) : base(EchoController.FormatMessage(channel, "dev_static_channel_category", category))
         {
             PartitionKey = "__echo_internal__";
-            RowKey = JsonConvert.SerializeObject(new
+            RowKey = JsonConvert.SerializeObject(new Marker
             {
                 Type = "category_marker",
                 Channel = channel,
