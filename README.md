@@ -10,10 +10,10 @@ Planned features inclue the ability to lock messages from deletion, and the crea
 ## Examples
 ## Emitting Information
 ### echo to the 'console' to get developer-centric information.
-We 'echo' messages in to a channel named 'dotnet', under the category 'noise.'
+We 'echo' messages in to a `channel: dotnet`, under the `category: noise`
 
 ```
-curl --data-urlencode "message=Hello world" --get http://localhost:8671/console/echo/dotnet/noise/
+curl --data-urlencode "message=Hello world" --get http://reliability/console/echo/dotnet/noise/
 ```
 
 ### echo business intelligence to the 'canvas' to get an idea of the larger picture.
@@ -25,7 +25,7 @@ The event is of:
 - `kind: start`
 
 ```
-curl --get http://localhost:8671/canvas/echo/dotnet/noise/0/1/start
+curl --get http://reliability/canvas/echo/dotnet/noise/0/1/start
 ```
 ## Viewing Information
 ### Console View
