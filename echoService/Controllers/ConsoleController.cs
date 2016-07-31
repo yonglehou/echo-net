@@ -15,7 +15,7 @@ using Newtonsoft.Json;
 
 namespace echoService.Controllers
 {
-    public class EchoController : ApiController
+    public class ConsoleController : ApiController
     {
         // this is how the view will be structured
         // channels are composed of categories which are composed of messages that are in time order.
@@ -33,13 +33,28 @@ namespace echoService.Controllers
             }
         }
 
-        public JsonResult<IEnumerable<EchoMessage>> GetAsync(string channel)
-        {         
+
+        /// <summary>
+        /// Gets all channels, and all categories
+        /// </summary>
+        /// <returns></returns>
+        public JsonResult<IReadOnlyDictionary<string, Dictionary<string, List<EchoMessage>>>> Get()
+        {
+            return Json(Buffer);
+        }
+
+        /// <summary>
+        /// Get all categories in a channel.
+        /// </summary>
+        /// <param name="channel"></param>
+        /// <returns></returns>
+        public JsonResult<IEnumerable<EchoMessage>> Get(string channel)
+        {
             // given only a channel (and no category) I will return a concatenated list of echo messages.
-            if(Buffer.ContainsKey(channel))
+            if (Buffer.ContainsKey(channel))
             {
                 IEnumerable<EchoMessage> allMessages = new List<EchoMessage>();
-                       
+
                 foreach (var category in Buffer[channel])
                 {
                     allMessages = allMessages.Concat(category.Value);
@@ -52,11 +67,12 @@ namespace echoService.Controllers
             return NoChannelError(channel);
         }
 
-        public JsonResult<IReadOnlyDictionary<string, Dictionary<string, List<EchoMessage>>>> Get()
-        {
-            return Json(Buffer);
-        }
-
+        /// <summary>
+        /// Get all messages in a channel and a category.
+        /// </summary>
+        /// <param name="channel"></param>
+        /// <param name="category"></param>
+        /// <returns></returns>
         // GET echo 
         public JsonResult<IEnumerable<EchoMessage>> Get(string channel, string category)
         {
@@ -75,45 +91,10 @@ namespace echoService.Controllers
             return NoChannelError(channel);
         }
 
-        /// <summary>
-        /// This should remain an asynchronous task, even if I do not currently capitalize on that.
-        /// </summary>
-        /// <param name="channel"></param>
-        /// <param name="category"></param>
-        /// <param name="formattedMessage"></param>
-        /// <returns></returns>
-        private async Task StoreMessage(EchoMessage message)
-        {
-            try
-            {
-                var internalBatchOperation = new TableBatchOperation();
-                var table = ControllerContext.Configuration.Properties["Table"] as CloudTable;
+        
 
-                GuaranteeChannelCategoryExists(internalBatchOperation, message.Channel, message.Category);
-
-                _buffer[message.Channel][message.Category].Add(message);
-
-                await table.ExecuteBatchAsync(internalBatchOperation); // internal data is on a separate partition.
-
-                await table.ExecuteAsync(TableOperation.InsertOrMerge(new EchoTableEntity(message)));
-
-                foreach (var result in await table.ExecuteBatchAsync(internalBatchOperation))
-                {
-                    ServiceEventSource.Current.Message($"Status code: {result.HttpStatusCode} - {Enum.GetName(typeof(HttpStatusCode), result.HttpStatusCode)}");
-                }
-            }
-            catch(ArgumentException ex) // previously hit on: All entities in a given batch must have the same partition key.
-            {
-                ServiceEventSource.Current.Message($"Argument Exception : {ex?.ParamName} - {ex.Message}\r\n{ex.StackTrace}");
-            }
-            catch(Exception ex)
-            {
-                ServiceEventSource.Current.Message($"Argument Exception : {ex.HResult} - {ex.Message}\r\n{ex.StackTrace}");
-            }
-        }
-
-        // echo/dotnet/noise/"hello world!"
-        public System.Web.Http.Results.JsonResult<string> Get(string channel, string category, string message)
+        // echo/dotnet/noise?message=hi
+        public JsonResult<string> Get(string channel, string category, [FromUri]string message)
         {
             var newMessage = FormatMessage(channel, category, message);
 
@@ -208,6 +189,36 @@ namespace echoService.Controllers
             }
 
             ServiceEventSource.Current.Message($"all data retrieved and serialized in {watch.ElapsedMilliseconds} ms - goal is 500 ms");
+        }
+
+        private async Task StoreMessage(EchoMessage message)
+        {
+            try
+            {
+                var internalBatchOperation = new TableBatchOperation();
+                var table = ControllerContext.Configuration.Properties["Table"] as CloudTable;
+
+                GuaranteeChannelCategoryExists(internalBatchOperation, message.Channel, message.Category);
+
+                _buffer[message.Channel][message.Category].Add(message);
+
+                await table.ExecuteBatchAsync(internalBatchOperation); // internal data is on a separate partition.
+
+                await table.ExecuteAsync(TableOperation.InsertOrMerge(new EchoTableEntity(message)));
+
+                foreach (var result in await table.ExecuteBatchAsync(internalBatchOperation))
+                {
+                    ServiceEventSource.Current.Message($"Status code: {result.HttpStatusCode} - {Enum.GetName(typeof(HttpStatusCode), result.HttpStatusCode)}");
+                }
+            }
+            catch (ArgumentException ex) // previously hit on: All entities in a given batch must have the same partition key.
+            {
+                ServiceEventSource.Current.Message($"Argument Exception : {ex?.ParamName} - {ex.Message}\r\n{ex.StackTrace}");
+            }
+            catch (Exception ex)
+            {
+                ServiceEventSource.Current.Message($"Argument Exception : {ex.HResult} - {ex.Message}\r\n{ex.StackTrace}");
+            }
         }
 
         #endregion

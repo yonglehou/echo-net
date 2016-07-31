@@ -18,7 +18,7 @@ namespace echoService.Model
 
     public class ChannelMarkerTableEntity : EchoTableEntity
     {
-        public ChannelMarkerTableEntity(string channel) : base(EchoController.FormatMessage(channel, "dev_static_channel_marker", channel))
+        public ChannelMarkerTableEntity(string channel) : base(ConsoleController.FormatMessage(channel, "dev_static_channel_marker", channel))
         {
             PartitionKey = "__echo_internal__";
             RowKey = JsonConvert.SerializeObject(new Marker
@@ -32,7 +32,7 @@ namespace echoService.Model
 
     public class CategoryMarkerTableEntity : EchoTableEntity
     {
-        public CategoryMarkerTableEntity(string channel, string category) : base(EchoController.FormatMessage(channel, "dev_static_channel_category", category))
+        public CategoryMarkerTableEntity(string channel, string category) : base(ConsoleController.FormatMessage(channel, "dev_static_channel_category", category))
         {
             PartitionKey = "__echo_internal__";
             RowKey = JsonConvert.SerializeObject(new Marker

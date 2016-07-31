@@ -20,8 +20,8 @@ namespace echoService
             config.Properties["Table"] = Table;
 
             config.Routes.MapHttpRoute(
-                name: "DefaultApi",
-                routeTemplate: "{controller}/{channel}/{category}/{message}",
+                name: "ConsoleApi",
+                routeTemplate: "{controller}/echo/{channel}/{category}/{message}",
                 defaults: new {
                     channel = RouteParameter.Optional,
                     category = RouteParameter.Optional,
@@ -29,6 +29,16 @@ namespace echoService
                 }
             );
 
+            config.Routes.MapHttpRoute(
+                name: "CanvasApi",
+                routeTemplate: "{controller}/echo/{channel}/{category}/{message}",
+                defaults: new
+                {
+                    channel = RouteParameter.Optional,
+                    category = RouteParameter.Optional,
+                    message = RouteParameter.Optional
+                }
+            );
             appBuilder.UseWebApi(config);
         }
     }

@@ -127,10 +127,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\CanvasController.cs" />
     <Compile Include="Model\EchoMessage.cs" />
     <Compile Include="Model\EchoTableEntity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Controllers\EchoController.cs" />
+    <Compile Include="Controllers\ConsoleController.cs" />
     <Compile Include="OwinCommunicationListener.cs" />
     <Compile Include="EchoService.cs" />
     <Compile Include="Program.cs" />
@@ -142,6 +143,7 @@
     <None Include="PackageRoot\ServiceManifest.xml" />
     <None Include="App.config" />
     <None Include="packages.config" />
+    <None Include="README.md" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
