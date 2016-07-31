@@ -8,12 +8,18 @@ Echo consists of two logical pieces: The first is a console-like aspect for view
 We 'echo' messages in to a channel named 'dotnet', under the category 'noise.'
 
 ```
-curl --data-urlencode "message=Hello world" --get http://localhost:8671/echo/console/dotnet/noise/
+curl --data-urlencode "message=Hello world" --get http://localhost:8671/console/echo/dotnet/noise/
 ```
 
 ### echo to the 'canvas'
+Emit a row in to a PowerBI `container: dotnet` and a PowerBI `table: noise`.
+The event is of:
+- `order: 0` 
+- `cardinality: 1`
+- `kind: start`
+
 ```
-curl --data-urlencode "message=Hello world" --get http://localhost:8671/echo/canvas/dotnet/noise/
+curl --get http://localhost:8671/canvas/echo/dotnet/noise/0/1/start
 ```
 
 ## Goals
