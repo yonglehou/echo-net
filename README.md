@@ -7,11 +7,11 @@ The backend of `echo-net` is a Service Fabric ASP.Net Core application.
 
 All messages echoed to the `console` have a very ephemeral life span: 1 hour. 
 
-## Goals
+## goals
 - Give developers the ability to inform their managers explicitly about their producitivty, and get in their way as little as possible. Not at all, if possible.
  
-## Examples
-## Emitting Information
+## examples
+## emitting information
 ### `echo-net` to the 'console' to get developer-centric information...
 We 'echo' messages in to a `channel: dotnet`, under the `category: noise`
 
@@ -30,14 +30,14 @@ The event is of:
 ```
 curl --get http://reliability/echonet/bi?container=dotnet&table=noise&order=0&cardinality=1&kind=start&category=recv-file
 ```
-## Viewing Information
-### Console View
+## viewing information
+### console view
 `Coming soon`
-### Canvas View
+### business intelligence view
 `Coming soon`
 
 
-# Planned Features
+# planned features
 - Private channels
 - Ability to prevent messages from being deleted.
 
