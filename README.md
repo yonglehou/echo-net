@@ -16,7 +16,7 @@ All messages echoed to the `console` have a very ephemeral life span: 1 hour.
 We 'echo' messages in to a `channel: dotnet`, under the `category: noise`
 
 ```
-curl --data-urlencode "message=Hello world" --get http://reliability/echonet/console?channel=dotnet&category=noise
+curl --data-urlencode "message=Hello world" --get http://localhost/echonet/console?channel=dotnet&category=noise
 ```
 
 ### `echo-net` business intelligence to get an idea of the larger picture...
@@ -28,7 +28,7 @@ The event is of:
 - `kind: start`
 - `category: recv-file`
 ```
-curl --get http://reliability/echonet/bi?container=dotnet&table=noise&order=0&cardinality=1&kind=start&category=recv-file
+curl --get http://localhost/echonet/bi?container=dotnet&table=noise&order=0&cardinality=1&kind=start&category=recv-file
 ```
 ## viewing information
 ### console view
