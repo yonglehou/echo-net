@@ -4,6 +4,7 @@ TODO:
 - Console web view
 - PowerBI implementation
 - Implementation of maintenance engines
+- 'this' implementation so that echo-net records itself
 
 # echo-net
 Meant to be used as a 'printf-like diagnostic tool' to aid in tracing distributed systems.
