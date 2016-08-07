@@ -11,6 +11,7 @@ All messages echoed to the `console` have a very ephemeral life span: 1 hour.
 - Create a cloud based printf-based console to help with debugging distributed systems.
 - Make sharing information easy.
 - Give developers the ability to inform their managers explicitly about their producitivty, and get in their way as little as possible. If possible, not at all. 
+- Gather feedback on usefulness
  
 ## examples
 ## emitting information
