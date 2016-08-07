@@ -7,7 +7,6 @@ The backend of `echo-net` is a Service Fabric ASP.Net Core application.
 
 All messages echoed to the `console` have a very ephemeral life span: 1 hour. 
 
-Planned features inclue the ability to lock messages from deletion, and the creation of private channels.
 # planned features
 - Private channels
 - Ability to prevent messages from being deleted.
