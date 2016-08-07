@@ -1,3 +1,10 @@
+TODO:
+- Upload new SLN
+- Move storage table code over to new sln
+- Console web view
+- PowerBI implementation
+- Implementation of maintenance engines
+
 # echo-net
 Meant to be used as a 'printf-like diagnostic tool' to aid in tracing distributed systems.
 
