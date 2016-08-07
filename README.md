@@ -5,7 +5,7 @@ To the end user `echo-net` consists of two logical pieces: The first is a consol
 
 The backend of `echo-net` is a Service Fabric ASP.Net Core application.
 
-All messages echoed to the `console` have a very ephemeral life span: 1 hour. 
+All messages echoed to the `console` have a relatively ephemeral life span of 1 hour. 
 
 ## goals
 - Create a cloud based printf-based console to help with debugging distributed systems.
