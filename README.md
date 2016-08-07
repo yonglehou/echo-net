@@ -11,14 +11,14 @@ Planned features inclue the ability to lock messages from deletion, and the crea
 
 ## Examples
 ## Emitting Information
-### echonet to the 'console' to get developer-centric information.
+### echonet to the 'console' to get developer-centric information...
 We 'echo' messages in to a `channel: dotnet`, under the `category: noise`
 
 ```
 curl --data-urlencode "message=Hello world" --get http://reliability/echonet/console?channel=dotnet&category=noise
 ```
 
-### echonet business intelligence to get an idea of the larger picture.
+### echonet business intelligence to get an idea of the larger picture...
 
 Emit a row in to a PowerBI `container: dotnet` and a PowerBI `table: noise`.
 The event is of:
