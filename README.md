@@ -5,7 +5,8 @@ TODO:
 - PowerBI implementation
 - Implementation of maintenance engines
 - 'this' implementation so that echo-net records itself
-
+- Attempt machine learning to auto categorize messages based on contents of echo messages.
+ 
 # echo-net
 Meant to be used as a 'printf-like diagnostic tool' to aid in tracing distributed systems.
 
