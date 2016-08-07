@@ -10,10 +10,6 @@ All messages echoed to the `console` have a very ephemeral life span: 1 hour.
 ## Goals
 - Give developers the ability to inform their managers explicitly about their producitivty, and get in their way as little as possible. Not at all, if possible.
  
-# planned features
-- Private channels
-- Ability to prevent messages from being deleted.
-
 ## Examples
 ## Emitting Information
 ### `echo-net` to the 'console' to get developer-centric information...
@@ -40,4 +36,8 @@ curl --get http://reliability/echonet/bi?container=dotnet&table=noise&order=0&ca
 ### Canvas View
 `Coming soon`
 
+
+# Planned Features
+- Private channels
+- Ability to prevent messages from being deleted.
 
