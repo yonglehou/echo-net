@@ -38,4 +38,4 @@ curl --get http://reliability/echonet/bi?container=dotnet&table=noise&order=0&ca
 `Coming soon`
 
 ## Goals
-- Let developer productivity guide business intelligence. As distributed systems come online and start doing work, rather than making the work of gathering data a separate work item the business could leverage pre-existing tendencies to trace work items. This tracing information could be generalized over in PowerBI to demonstrate pure business value.
+- Get out of the developer way as much as possible, while still allowing business to be informed of value.
