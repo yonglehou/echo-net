@@ -1,12 +1,12 @@
 TODO:
-- Upload new SLN
-- Move storage table code over to new sln
-- Console web view
-- PowerBI implementation
-- Implementation of maintenance engines
-- 'this' implementation so that echo-net records itself
-- Attempt machine learning to auto categorize messages based on contents of echo messages.
-- Use this data to auto generate reports based on the sets of messages? 
+- Requirement: Upload new SLN
+- Requirement: Move storage table code over to new sln
+- Requirement: Console web view
+- Requirement: PowerBI implementation
+- Requirement: Implementation of maintenance engines
+- Test Requirement: 'this' implementation so that echo-net records itself
+- Experimental: Attempt machine learning to auto categorize messages based on contents of echo messages.
+- Experimental: Use this data to auto generate reports based on the sets of messages? 
  
 
 # echo-net
