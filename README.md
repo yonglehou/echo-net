@@ -38,7 +38,4 @@ curl --get http://reliability/echonet/bi?container=dotnet&table=noise&order=0&ca
 `Coming soon`
 
 ## Goals
-- echoing information should be fast and non-essential (i.e. if we fail to find the service, move along)
-- an end-user can union channels/categories together. This means independent pieces can be developed in isolation, and then
-when the distributed pieces come together the same trace calls will work to examine the entire distributed system.
-- echoing information to a 'canvas' is a whimsical way of saying that we're emitting an event in to our PowerBI container.
+- Let developer productivity guide business intelligence. As distributed systems come online and start doing work, rather than making the work of gathering data a separate work item the business could leverage pre-existing tendencies to trace work items. This tracing information could be generalized over in PowerBI to demonstrate 
