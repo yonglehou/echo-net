@@ -6,7 +6,7 @@ TODO:
 - Requirement: Implementation of maintenance engines
 - Test Requirement: 'this' implementation so that echo-net records itself
 - Experimental: Attempt machine learning to auto categorize messages based on contents of echo messages.
-- Experimental: Use this data to auto generate reports based on the sets of message kinds? 
+- Experimental: Use this data to auto generate reports by auto categorizing kinds of messages and then generating reports from selected sets of kinds of messages (i.e. basic perf messages can be inferred from start/stop kinds) 
  
 
 # echo-net
